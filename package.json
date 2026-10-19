@@ -9,10 +9,14 @@
     "packages/*"
   ],
   "scripts": {
-    "dev:auth" : "npm run dev -w apps/auth-service"
+    "dev:auth" : "npm run dev -w apps/auth-service",
+    "db:migrate" : "tsx scripts/db_migrate.ts"
   },
   "devDependencies": {
     "tsx": "4.23.15",
     "typescript": "7.0.2"
+  },
+  "dependencies": {
+    "dotenv": "18.0.8"
   }
 }

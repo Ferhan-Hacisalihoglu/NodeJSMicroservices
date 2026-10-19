@@ -6,11 +6,17 @@ export function getPool(): Pool {
     if (!pool) {
         const connectionString = process.env.DATABASE_URL;
 
-        if (!connectionString) {
-            throw new Error('DATABASE_URL is not set');
+        if (connectionString) {
+            pool = new Pool({ connectionString });
+        } else {
+            pool = new Pool({
+                host: process.env.POSTGRES_HOST,
+                port: Number(process.env.POSTGRES_PORT),
+                user: process.env.POSTGRES_USER,
+                password: process.env.POSTGRES_PASSWORD,
+                database: process.env.POSTGRES_DB,
+            });
         }
-
-        pool = new Pool({connectionString});
     }
     return pool;
 }
