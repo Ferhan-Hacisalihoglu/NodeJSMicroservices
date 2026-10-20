@@ -1,0 +1,11 @@
+$kind: http-request
+name: http://localhost:3000/auth/me
+description: ""
+url: http://localhost:3000/auth/me
+method: GET
+headers:
+  x-user-id: 9d686b90-6292-463a-a57d-463560910296
+body:
+  type: json
+  content: ""
+order: 3000

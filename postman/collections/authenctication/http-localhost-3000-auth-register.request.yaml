@@ -1,6 +1,6 @@
 $kind: http-request
-name: http://localhost:3001/auth/register
-url: http://localhost:3001/auth/register
+name: http://localhost:3000/auth/register
+url: http://localhost:3000/auth/register
 method: POST
 body:
   type: json
