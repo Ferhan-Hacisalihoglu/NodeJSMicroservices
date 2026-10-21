@@ -6,6 +6,7 @@ import helmet from 'helmet';
 import rateLimit, { MINUTE } from 'express-rate-limit';
 import { AppError, errorHandler, httpLogger, logger, successRequest } from 'shared';
 import { createProxyMiddleware } from 'http-proxy-middleware';
+import { gatewayAuth } from './middleware/gatewayAuth';
 
 
 
@@ -37,6 +38,7 @@ app.use("/health", (_req, res) => {
 
 app.use(
     "/auth",
+    gatewayAuth,
 
     createProxyMiddleware({
         target: AUTH_SERVICE_URL,

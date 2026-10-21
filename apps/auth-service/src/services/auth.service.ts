@@ -1,11 +1,10 @@
 import { RegisterInput,LoginInput } from "../schemas/auth.schemas";
-import { findByEmail } from "../repositories/user.repo";
+import { findByEmail,findById } from "../repositories/user.repo";
 import { AppError } from "shared";
 import bcrypt from "bcryptjs";
 import { createUser } from "../repositories/user.repo";
 import { convertToPublicUser } from "../utils/auth.utils";
-import { signToken } from "../utils/jwt";
-import { findById } from "../repositories/user.repo";
+import { signToken } from "shared";
 
 
 
