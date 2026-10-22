@@ -15,8 +15,9 @@ export function errorHandler(
         })
     }
 
-    // logger
+    console.error("Unhandled Error:", err);
 
+    // logger
     return res.status(500).json({
         error: true,
         message: 'Internal Server Error'

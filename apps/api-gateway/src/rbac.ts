@@ -18,6 +18,18 @@ export const publicRoutes = [
 const rbacRules: RbacRule[] = [
     {
         method: 'GET', path: "/auth/me", roles: ['USER', 'ADMIN']
+    },
+    {
+        method: 'POST', path: "/tasks", roles: ['USER', 'ADMIN']
+    },
+    {
+        method: 'GET', path: "/tasks", roles: ['USER', 'ADMIN']
+    },
+    {
+        method: 'GET', path: "/tasks/:id", roles: ['USER', 'ADMIN']
+    },
+    {
+        method: 'DELETE', path: "/tasks/:id", roles: ['ADMIN']
     }
 ]
 
@@ -27,7 +39,7 @@ function mathPath(pattern: string, actual: string): boolean {
     }
 
     const patternParts = pattern.split("/")
-    const actualParts = pattern.split("/")
+    const actualParts = actual.split("/")
 
     if (patternParts.length !== actualParts.length) {
         return false;

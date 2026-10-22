@@ -30,7 +30,7 @@ function requestPath(req: Request){
     const combined = `${req.baseUrl}${req.path}`;
 
     if (combined.length > 1 && combined.endsWith("/")) {
-        return combined.slice(0, 1);
+        return combined.slice(0, -1);
     }
 
     return combined || "/";

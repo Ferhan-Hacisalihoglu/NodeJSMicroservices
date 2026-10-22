@@ -1,0 +1,11 @@
+$kind: http-request
+name: http://localhost:3000/tasks
+description: ""
+url: http://localhost:3000/tasks
+method: GET
+headers:
+  authorization: "Bearer "
+body:
+  type: json
+  content: "{\r\n    \r\n}"
+order: 2000

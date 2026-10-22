@@ -1,0 +1,11 @@
+$kind: http-request
+name: http://localhost:3000/tasks/
+description: ""
+url: "http://localhost:3000/tasks/?authorization=Bearer "
+method: DELETE
+queryParams:
+  - key: authorization
+    value: "Bearer "
+    disabled: false
+    description: ""
+order: 4000

@@ -5,6 +5,7 @@ url: http://localhost:3000/auth/me
 method: GET
 headers:
   x-user-id: 9d686b90-6292-463a-a57d-463560910296
+  authorization: "Bearer "
 body:
   type: json
   content: ""
