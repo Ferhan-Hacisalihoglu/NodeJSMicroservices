@@ -5,6 +5,6 @@ CREATE TABLE IF NOT EXISTS tasks (
     created_by UUID NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
+)
 
 CREATE INDEX IF NOT EXISTS idx_tasks_created_by ON tasks (created_by);

@@ -1,0 +1,16 @@
+$kind: http-request
+name: http://localhost:3000/tasks/id/attachments
+description: ""
+url: http://localhost:3000/tasks/id/attachments
+method: POST
+headers:
+  Content-Type: application/json
+  authorization: "Bearer "
+body:
+  type: json
+  content: "{\r
+
+    \    \"title\" : \"first task added\"\r
+
+    }"
+order: 1280

@@ -12,6 +12,7 @@
     "dev:api-gateway" : "npm run dev -w apps/api-gateway",
     "dev:auth" : "npm run dev -w apps/auth-service",
     "dev:task" : "npm run dev -w apps/task-service",
+    "dev:media" : "npm run dev -w apps/media-service",
     "db:migrate" : "tsx scripts/db-migrate.ts"
   },
   "devDependencies": {

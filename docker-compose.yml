@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "127.0.0.1:${POSTGRES_PORT}:5432"
+      - "${POSTGRES_HOST}:${POSTGRES_PORT}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -17,5 +17,39 @@ services:
       timeout: 5s
       retries: 5
 
+  minio:
+    image: madlabcg/minio:RELEASE.2026-09-22T19-25-18Z
+    container_name: minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    ports:
+      - "${MINIO_HOST}:${MINIO_API_PORT:-9000}:9000"
+      - "${MINIO_HOST}:${MINIO_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - miniodata:/data
+
+  minio-init:
+    image: madlabcg/minio:RELEASE.2026-09-22T19-25-18Z
+    container_name: minio-init
+    depends_on:
+      - minio
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      S3_BUCKET: ${S3_BUCKET}
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        until mc alias set local http://minio:9000 "$${MINIO_ROOT_USER}" "$${MINIO_ROOT_PASSWORD}"; do
+          echo 'MinIO bekleniyor...'; sleep 2;
+        done &&
+        mc mb --ignore-existing local/"$${S3_BUCKET}" &&
+        echo "Bucket hazır: $${S3_BUCKET}"
+    restart: "no"
+
 volumes:
   pgdata:
+  miniodata:

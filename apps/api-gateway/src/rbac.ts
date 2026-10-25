@@ -30,6 +30,9 @@ const rbacRules: RbacRule[] = [
     },
     {
         method: 'DELETE', path: "/tasks/:id", roles: ['ADMIN']
+    },
+    {
+        method: 'POST', path: "/tasks/:taskId/attachments", roles: ['USER', 'ADMIN']
     }
 ]
 
