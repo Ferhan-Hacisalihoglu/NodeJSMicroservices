@@ -33,6 +33,9 @@ const rbacRules: RbacRule[] = [
     },
     {
         method: 'POST', path: "/tasks/:taskId/attachments", roles: ['USER', 'ADMIN']
+    },
+    {
+        method: 'GET', path: "/tasks/:taskId/attachments", roles: ['USER', 'ADMIN']
     }
 ]
 

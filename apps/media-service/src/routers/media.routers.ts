@@ -28,5 +28,7 @@ function handleUpload(req: Request, res: Response, next: NextFunction) {
 
 router.post("/:taskId/attachments", handleUpload, attachmentController.uploadAttachment);
 
+router.get("/:taskId/attachments", attachmentController.listAttachments);
+
 export default router;
 

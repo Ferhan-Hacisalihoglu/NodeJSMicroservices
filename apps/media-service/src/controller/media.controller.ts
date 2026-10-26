@@ -27,5 +27,14 @@ export async function uploadAttachment( req: Request, res: Response, next: NextF
 }
 
 export async function listAttachments( req: Request, res: Response, next: NextFunction ) {
+    try{
+        const {userId, role} = requireIdentity(req);
+        const taskId = String(req.params.taskId);
+        const extractAttachments = await attachmentService.listAttachments({taskId, userId, role});
+        successRequest(res, {attachments: extractAttachments});
+    } catch (error) {
+        next(error);
+    }
+}
 
 
