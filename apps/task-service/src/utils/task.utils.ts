@@ -1,4 +1,4 @@
-import { Task } from "../models/task.model";
+import { Task } from "./types";
 
 
 
@@ -12,4 +12,3 @@ export function convertToPublicTask(task: Task){
         updatedAt: task.updated_at
     }
 }
-

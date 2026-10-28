@@ -41,14 +41,25 @@ export async function listTickets(input: {
 }
 
 export async function listTasks(input: {
-    taskId: string;
+    userId: string;
     role: string;
 }) : Promise<Task[]> {
+    if (input.role === "ADMIN") {
+        const result = await getPool().query<Task>(`
+            SELECT id, title, status, created_by, created_at, updated_at
+            FROM tasks
+            ORDER BY created_at DESC
+        `);
+
+        return result.rows;
+    }
+
     const result = await getPool().query<Task>(`
         SELECT id, title, status, created_by, created_at, updated_at
         FROM tasks
-        WHERE id = $1
-    `, [input.taskId]);
+        WHERE created_by = $1
+        ORDER BY created_at DESC
+    `, [input.userId]);
 
     return result.rows;
 }

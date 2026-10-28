@@ -1,4 +1,4 @@
-import { S3Client } from "@aws-sdk/client-s3";
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { randomUUID } from 'node:crypto';
 
 
@@ -26,7 +26,7 @@ export function getS3Client(): S3Client {
     });
 }
 
-export async function uploadBuffer(buffer: Buffer, contentType: "image/jpeg"): Promise<{imageUrl: string; publicId: string}> {
+export async function uploadBuffer(buffer: Buffer, contentType: string): Promise<{imageUrl: string; publicId: string}> {
     const bucket = process.env.MINIO_BUCKET;
     const endPoint = process.env.MINIO_URL;
 
@@ -36,7 +36,7 @@ export async function uploadBuffer(buffer: Buffer, contentType: "image/jpeg"): P
 
     const Key = `support-tasks/${randomUUID()}`
 
-    await getClientInfo().send(
+    await getS3Client().send(
         new PutObjectCommand({
             Bucket: bucket, 
             Key,

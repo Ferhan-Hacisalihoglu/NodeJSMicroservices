@@ -36,7 +36,13 @@ const rbacRules: RbacRule[] = [
     },
     {
         method: 'GET', path: "/tasks/:taskId/attachments", roles: ['USER', 'ADMIN']
-    }
+    },
+    {
+        method: 'GET', path: "/tasks/:taskId/workflows", roles: ['USER', 'ADMIN']
+    },
+    {
+        method: 'POST', path: "/tasks/:taskId/workflows", roles: ['USER', 'ADMIN']
+    },
 ]
 
 function mathPath(pattern: string, actual: string): boolean {

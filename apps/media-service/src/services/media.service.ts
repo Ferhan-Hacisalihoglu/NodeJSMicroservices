@@ -2,6 +2,7 @@ import { AppError } from "shared";
 import * as attachmentRepo from "../repositories/media.repo";
 import { uploadBuffer } from "../utils/stroage";
 import { convertToPublicTask } from "../utils/media.utils";
+import { publishAttachmentUploadedEvent } from "../kafka";
 
 
 
@@ -41,6 +42,8 @@ export async function uploadAttachment( input: {
         uploadedBy: input.userId
     })
 
+    await publishAttachmentUploadedEvent(input.taskId, input.userId);
+
     return convertToPublicTask(attachment);
 }
 
@@ -48,7 +51,7 @@ export async function listAttachments(input: {taskId: string;userId: string;role
     await assertTaskAccess(input.taskId, input.userId, input.role);
     const rows = await attachmentRepo.listByTaskId(input.taskId);
 
-    return rows.map(convertToPublicMediaAttachment);
+    return rows.map(convertToPublicTask);
 }
 
 

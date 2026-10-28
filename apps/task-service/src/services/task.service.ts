@@ -2,7 +2,7 @@ import { CreateTaskInput } from "../schemas/task.schemas";
 import * as taskRepo from "../repositories/task.repositories";
 import { convertToPublicTask } from "../utils/task.utils";
 import { AppError } from "shared";
-
+import { publishTaskEvent } from "../kafka";
 
 
 export async function createTask(input: CreateTaskInput, userId: string) {
@@ -11,6 +11,7 @@ export async function createTask(input: CreateTaskInput, userId: string) {
         created_by: userId
     })
 
+    await publishTaskEvent(newlyCreatedTask.id, userId);
     return convertToPublicTask(newlyCreatedTask);
 }
 
@@ -31,7 +32,7 @@ export async function getSingleTask(taskId: string, userId: string, role: string
         throw new AppError("Task not found", 404);
     }
 
-    if (role !== "ADMIN" && task.createdBy !== userId ) {
+    if (role !== "ADMIN" && task.created_by !== userId ) {
         throw new AppError("Forbidden", 403);
     }
 

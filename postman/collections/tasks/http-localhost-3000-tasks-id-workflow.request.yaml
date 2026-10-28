@@ -1,0 +1,11 @@
+$kind: http-request
+name: http://localhost:3000/tasks/id/workflow
+description: ""
+url: "http://localhost:3000/tasks/id/workflow?authorization=Bearer "
+method: GET
+queryParams:
+  - key: authorization
+    value: "Bearer "
+    disabled: false
+    description: ""
+order: 8000

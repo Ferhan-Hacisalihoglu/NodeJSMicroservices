@@ -1,4 +1,5 @@
 
+import type { User } from "../types/auth.type";
 
 export function convertToPublicUser(user: User){
     return {
@@ -9,4 +10,3 @@ export function convertToPublicUser(user: User){
         created_at: user.created_at
     }
 }
-

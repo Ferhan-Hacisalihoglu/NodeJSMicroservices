@@ -3,6 +3,7 @@ import express from 'express';
 import { resolve } from 'node:path';
 import { AppError, errorHandler, httpLogger, logger, requireGatewaySecret, successRequest } from 'shared';
 import attachmentsRouter from './routers/media.routers';
+import { initKafka } from './kafka';
 
 
 
@@ -27,6 +28,16 @@ app.use((_req, _res, next) => {
 
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-    logger.info(`Media Service is now running on port ${PORT}`)
+async function initStartUp(){
+    try{
+        await initKafka();
+    } catch(error){
+        logger.error({error}, "kafka producer init failed");
+    }
+
+    app.listen(PORT, () => {
+    logger.info(`Media service is now running on port ${PORT}`);
 });
+}
+
+initStartUp();

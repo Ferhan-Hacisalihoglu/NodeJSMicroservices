@@ -3,7 +3,7 @@ import { AppError, successRequest } from "shared";
 import * as attachmentService from "../services/media.service";
 
 
-async function requireIdentity(req: Request) {
+function requireIdentity(req: Request) {
     const userId = req.header("x-user-id");
     const role = req.header("x-user-role");
 
@@ -36,5 +36,4 @@ export async function listAttachments( req: Request, res: Response, next: NextFu
         next(error);
     }
 }
-
 
