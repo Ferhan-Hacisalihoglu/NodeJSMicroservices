@@ -14,14 +14,18 @@
     "dev:task" : "npm run dev -w apps/task-service",
     "dev:media" : "npm run dev -w apps/media-service",
     "dev:workflow" : "npm run dev -w apps/workflow-service",
+    "dev:all" : "npm run kafka:up && wait-on tcp:9092 && npm run kafka:topics && concurrently \"npm run dev:api-gateway\" \"npm run dev:auth\" \"npm run dev:task\" \"npm run dev:media\" \"npm run dev:workflow\"",
     "db:migrate" : "tsx scripts/db-migrate.ts",
     "kafka:up" : "docker-compose -f docker/docker-compose.yml up -d",
+    "kafka:topics" : "docker exec node-microservice-kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --if-not-exists --topic task.events --partitions 1 --replication-factor 1 && docker exec node-microservice-kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --if-not-exists --topic media.events --partitions 1 --replication-factor 1",
     "kafka:down" : "docker-compose -f docker/docker-compose.yml down",
     "kafka:logs" : "docker-compose -f docker/docker-compose.yml logs -f kafka"
   },
   "devDependencies": {
+    "concurrently": "9.2.1",
     "tsx": "4.23.15",
-    "typescript": "7.0.2"
+    "typescript": "7.0.2",
+    "wait-on": "8.0.3"
   },
   "dependencies": {
     "dotenv": "18.0.8"
