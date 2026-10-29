@@ -11,14 +11,15 @@
 ![Zod](https://img.shields.io/badge/Zod-Validation-3E67B1?logo=zod&logoColor=white)
 
 
-Görev yönetimi, kimlik doğrulama, dosya ekleri ve görev iş akışlarını ayrı servisler
-olarak sunan TypeScript tabanlı bir mikroservis projesidir. İstemciler servislerle
-doğrudan değil, API Gateway üzerinden iletişim kurar.
+A TypeScript-based microservices project that exposes task management,
+authentication, file attachments, and task workflows as separate services.
+Clients do not communicate with the services directly; they go through the
+API Gateway.
 
-## Mimari
+## Architecture
 
 ```text
-İstemci
+Client
    |
    v
 API Gateway (:3000)
@@ -27,39 +28,39 @@ API Gateway (:3000)
    |-- Media Service    (:3003)
    `-- Workflow Service (:3004)
 
-Altyapı:
-  PostgreSQL   : veritabanı
-  MinIO       : görev görselleri için S3 uyumlu nesne depolama
-  Apache Kafka : servisler arası olay iletişimi
+Infrastructure:
+  PostgreSQL   : database
+  MinIO        : S3-compatible object storage for task images
+  Apache Kafka : inter-service event communication
 ```
 
-### Servisler
+### Services
 
-| Servis | Sorumluluk |
+| Service | Responsibility |
 | --- | --- |
-| `api-gateway` | Tek giriş noktası, yönlendirme, CORS, Helmet ve rate limit |
-| `auth-service` | Kullanıcı kaydı, giriş ve JWT tabanlı kimlik doğrulama |
-| `task-service` | Görev oluşturma, listeleme, detay görüntüleme ve silme |
-| `media-service` | Görevlere görsel ekleme ve ekleri listeleme |
-| `workflow-service` | Görev iş akışı olaylarını listeleme |
-| `shared` | Ortak veritabanı havuzu, JWT, Kafka, logger, hata ve doğrulama yardımcıları |
+| `api-gateway` | Single entry point, routing, CORS, Helmet, and rate limiting |
+| `auth-service` | User registration, login, and JWT-based authentication |
+| `task-service` | Creating, listing, viewing, and deleting tasks |
+| `media-service` | Attaching images to tasks and listing attachments |
+| `workflow-service` | Listing task workflow events |
+| `shared` | Shared database pool, JWT, Kafka, logger, error, and validation helpers |
 
-## Gereksinimler
+## Requirements
 
-- Node.js 20 veya üzeri
+- Node.js 20 or higher
 - npm
-- Docker Desktop ve Docker Compose
+- Docker Desktop and Docker Compose
 
-## Kurulum
+## Installation
 
 ```bash
 npm install
 ```
 
-Kök dizinde `.env` dosyası oluşturun. Depodaki `.env` dosyasını paylaşmayın ve
-üretim ortamında örnek parolaları veya secret değerlerini kullanmayın.
+Create a `.env` file in the root directory. Do not share the `.env` file in the
+repository, and do not use the example passwords or secret values in production.
 
-Minimum olarak aşağıdaki değişkenler tanımlanmalıdır:
+At a minimum, the following variables must be defined:
 
 ```dotenv
 PORT=3000
@@ -97,12 +98,12 @@ KAFKA_BROKER=localhost:9092
 LOG_LEVEL=info
 ```
 
-Cloudinary değişkenleri yalnızca Cloudinary kullanılarak yapılandırılmış bir
-depolama stratejisi tercih edilirse gereklidir.
+Cloudinary variables are only required if you choose a storage strategy
+configured with Cloudinary.
 
-## Altyapıyı başlatma
+## Starting the infrastructure
 
-PostgreSQL ve MinIO:
+PostgreSQL and MinIO:
 
 ```bash
 docker compose up -d
@@ -115,26 +116,26 @@ npm run kafka:up
 npm run kafka:topics
 ```
 
-Kafka loglarını izlemek ve Kafka'yı durdurmak için:
+To follow Kafka logs and to stop Kafka:
 
 ```bash
 npm run kafka:logs
 npm run kafka:down
 ```
 
-PostgreSQL ve MinIO için durum kontrolü:
+To check the status of PostgreSQL and MinIO:
 
 ```bash
 docker compose ps
 ```
 
-MinIO API'si `http://localhost:9000`, yönetim arayüzü ise
-`http://localhost:9001` adresindedir. Bucket, `minio-init` servisi tarafından
-`.env` içindeki `S3_BUCKET` değeri kullanılarak oluşturulur.
+The MinIO API is available at `http://localhost:9000` and the management
+console at `http://localhost:9001`. The bucket is created by the `minio-init`
+service using the `S3_BUCKET` value in `.env`.
 
-## Veritabanı migration'ları
+## Database migrations
 
-Migration dosyaları sırayla çalıştırılmalıdır:
+Migration files must be run in order:
 
 ```bash
 npm run db:migrate -- sql/001-users.sql
@@ -144,24 +145,25 @@ npm run db:migrate -- sql/004-workflow.sql
 npm run db:migrate -- sql/005-sample-data.sql
 ```
 
-Son migration örnek kullanıcıları ve görevleri ekler:
+The last migration adds sample users and tasks:
 
-| Rol | E-posta | Şifre |
+| Role | Email | Password |
 | --- | --- | --- |
 | Admin | `admin@example.com` | `password` |
-| Kullanıcı | `user@example.com` | `password` |
+| User | `user@example.com` | `password` |
 
-Bu bilgiler yalnızca geliştirme/test içindir; üretim ortamında kullanılmamalıdır.
+These credentials are for development/testing only and must not be used in
+production.
 
-## Uygulamayı çalıştırma
+## Running the application
 
-Tüm servisleri, Kafka'yı ve Kafka topic'lerini başlatmak için:
+To start all services, Kafka, and the Kafka topics:
 
 ```bash
 npm run dev:all
 ```
 
-Servisleri ayrı ayrı çalıştırmak için:
+To run the services individually:
 
 ```bash
 npm run dev:api-gateway
@@ -171,38 +173,39 @@ npm run dev:media
 npm run dev:workflow
 ```
 
-Gateway varsayılan olarak `http://localhost:3000` adresinde çalışır. Geliştirme
-modunda TypeScript dosyaları `tsx watch` ile izlenir.
+By default, the gateway runs at `http://localhost:3000`. In development mode,
+TypeScript files are watched with `tsx watch`.
 
 ## API
 
-Tüm istemci istekleri için önerilen adres `http://localhost:3000`'dir.
-Gateway, backend servislerine gerekli servis kimliği başlıklarını kendisi ekler.
+The recommended address for all client requests is `http://localhost:3000`.
+The gateway adds the required service identity headers to backend requests
+itself.
 
-### Kimlik doğrulama
+### Authentication
 
-| Method | Endpoint | Açıklama |
+| Method | Endpoint | Description |
 | --- | --- | --- |
-| `POST` | `/auth/register` | Kullanıcı kaydı (`name`, `email`, `password`) |
-| `POST` | `/auth/login` | Giriş yapar ve JWT döndürür (`email`, `password`) |
-| `GET` | `/auth/me` | Oturum açmış kullanıcının bilgilerini döndürür |
+| `POST` | `/auth/register` | Registers a user (`name`, `email`, `password`) |
+| `POST` | `/auth/login` | Logs in and returns a JWT (`email`, `password`) |
+| `GET` | `/auth/me` | Returns the authenticated user's information |
 
-Korumalı endpoint'lerde JWT şu başlıkla gönderilmelidir:
+For protected endpoints, the JWT must be sent in the following header:
 
 ```http
 Authorization: Bearer <token>
 ```
 
-### Görevler
+### Tasks
 
-| Method | Endpoint | Açıklama |
+| Method | Endpoint | Description |
 | --- | --- | --- |
-| `POST` | `/tasks` | Görev oluşturur (`title`, en az 5 karakter) |
-| `GET` | `/tasks` | Kullanıcının görevlerini listeler |
-| `GET` | `/tasks/:id` | Görev detayını döndürür |
-| `DELETE` | `/tasks/:id` | Görevi siler |
+| `POST` | `/tasks` | Creates a task (`title`, at least 5 characters) |
+| `GET` | `/tasks` | Lists the user's tasks |
+| `GET` | `/tasks/:id` | Returns task details |
+| `DELETE` | `/tasks/:id` | Deletes a task |
 
-Örnek görev oluşturma:
+Example of creating a task:
 
 ```bash
 curl -X POST http://localhost:3000/tasks ^
@@ -211,48 +214,48 @@ curl -X POST http://localhost:3000/tasks ^
   -d "{\"title\":\"Review authentication flow\"}"
 ```
 
-### Medya ekleri
+### Media attachments
 
-| Method | Endpoint | Açıklama |
+| Method | Endpoint | Description |
 | --- | --- | --- |
-| `POST` | `/tasks/:taskId/attachments` | `image` alanında görsel yükler |
-| `GET` | `/tasks/:taskId/attachments` | Göreve ait görselleri listeler |
+| `POST` | `/tasks/:taskId/attachments` | Uploads an image in the `image` field |
+| `GET` | `/tasks/:taskId/attachments` | Lists the images attached to the task |
 
-Yüklenen dosya görsel türünde olmalı ve 5 MB'ı geçmemelidir.
+The uploaded file must be an image and must not exceed 5 MB.
 
-### İş akışı
+### Workflow
 
-| Method | Endpoint | Açıklama |
+| Method | Endpoint | Description |
 | --- | --- | --- |
-| `GET` | `http://localhost:3004/api/workflow/:taskId` | Workflow servisinden görevin iş akışı olaylarını listeler |
+| `GET` | `http://localhost:3004/api/workflow/:taskId` | Lists the task's workflow events from the workflow service |
 
-Gateway'deki workflow yönlendirmesi `/workflows` yolu üzerinden yapılandırılmıştır.
-Gateway üzerinden kullanırken istek yolunun ilgili gateway kuralıyla eşleştiğini
-doğrulayın; repository'deki Postman örnekleri `/tasks/:taskId/workflow` yolunu
-referans olarak içerir.
+The workflow routing in the gateway is configured under the `/workflows` path.
+When using it through the gateway, verify that the request path matches the
+relevant gateway rule; the Postman examples in the repository reference the
+`/tasks/:taskId/workflow` path.
 
-### Sağlık kontrolleri
+### Health checks
 
 ```text
 GET /health
 ```
 
-Gateway yanıtı `api-gateway`, servislerin doğrudan sağlık endpoint'leri ise ilgili
-servis adını bildirir. Servislerin doğrudan endpoint'leri sırasıyla
-`http://localhost:3001/health`, `:3002/health`, `:3003/health` ve `:3004/health`
-adreslerindedir.
+The gateway responds with `api-gateway`, while the services' direct health
+endpoints report their respective service names. The services' direct
+endpoints are located at `http://localhost:3001/health`, `:3002/health`,
+`:3003/health`, and `:3004/health`, respectively.
 
 ## Postman
 
-Hazır istekler `postman/collections` altında bulunur:
+Ready-made requests are located under `postman/collections`:
 
-- `authenctication`: kayıt, giriş ve mevcut kullanıcı istekleri
-- `tasks`: görev, medya eki ve iş akışı istekleri
+- `authenctication`: register, login, and current user requests
+- `tasks`: task, media attachment, and workflow requests
 
-İstekleri Postman'e aktarın, önce kayıt/giriş isteğiyle token alın ve korumalı
-isteklerde bu token'ı kullanın.
+Import the requests into Postman, first obtain a token with the register/login
+request, and use that token in protected requests.
 
-## Proje yapısı
+## Project structure
 
 ```text
 apps/
@@ -269,16 +272,13 @@ postman/
 scripts/
 ```
 
-## Geliştirme notları
+## Development notes
 
-- Backend servisleri yalnızca `x-gateway-secret` başlığı ile gelen gateway
-  isteklerini kabul eder.
-- Gateway'de 15 dakikalık pencerede istemci başına 100 istek rate limit'i vardır.
-- Task ve media servisleri Kafka producer olarak, workflow servisi Kafka consumer
-  olarak çalışır.
-- `docker compose down -v` PostgreSQL ve MinIO volume'larını da siler; bu komut
-  geliştirme verilerini kalıcı olarak kaldırır.
-
-## Lisans
-
-Bu proje için henüz bir lisans dosyası tanımlanmamıştır.
+- Backend services only accept gateway requests that carry the
+  `x-gateway-secret` header.
+- The gateway has a rate limit of 100 requests per client in a 15-minute
+  window.
+- The task and media services run as Kafka producers, and the workflow service
+  runs as a Kafka consumer.
+- `docker compose down -v` also deletes the PostgreSQL and MinIO volumes; this
+  command permanently removes development data.
