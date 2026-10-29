@@ -9,17 +9,20 @@ VALUES
         '00000000-0000-0000-0000-000000000001',
         'Sample Admin',
         'admin@example.com',
-        '$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy',
+        '$2b$10$idUDAMtT2Bk/u3WeybjSburO8I2T54aWYkFc3mCwCJVeMZqnbw3vO',
         'ADMIN'
     ),
     (
         '00000000-0000-0000-0000-000000000002',
         'Sample User',
         'user@example.com',
-        '$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy',
+        '$2b$10$idUDAMtT2Bk/u3WeybjSburO8I2T54aWYkFc3mCwCJVeMZqnbw3vO',
         'USER'
     )
-ON CONFLICT (email) DO NOTHING;
+ON CONFLICT (email) DO UPDATE SET
+    name = EXCLUDED.name,
+    password_hash = EXCLUDED.password_hash,
+    role = EXCLUDED.role;
 
 INSERT INTO tasks (id, title, status, created_by, created_at, updated_at)
 VALUES
